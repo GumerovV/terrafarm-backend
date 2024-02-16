@@ -53,9 +53,6 @@ export class AuthService {
 		const basket = this.basketRepository.create({ user: user })
 		await this.basketRepository.save(basket)
 
-		const info = this.infoRepository.create({ user: user })
-		await this.infoRepository.save(info)
-
 		return {
 			user: this.returnUserFields(user),
 			accessToken: await this.issueAccessToken(user.id, user.email, user.role),

@@ -9,6 +9,7 @@ import { Repository } from 'typeorm'
 import { BasketEntity } from './basket.entity'
 import { ProductEntity } from '../product/product.entity'
 import { InfoEntity } from '../info/info.entity'
+import { InfoDto } from '../info/info.dto'
 
 @Injectable()
 export class BasketService {
@@ -43,9 +44,6 @@ export class BasketService {
 				products: {
 					product: true,
 				},
-			},
-			order: {
-				createdAt: 'DESC',
 			},
 		})
 
@@ -116,7 +114,7 @@ export class BasketService {
 		return basketItem
 	}
 
-	async createOrder(userId: number) {
+	async createOrder(userId: number, infoDto: InfoDto) {
 		const basket = await this.basketRepository.findOne({
 			where: { user: { id: userId }, status: 'ACTIVE' },
 			relations: { products: true },
@@ -126,15 +124,15 @@ export class BasketService {
 		if (basket.products.length === 0)
 			throw new BadRequestException('Корзина пуста!')
 
-		const info = await this.infoRepository.findOneBy({ user: { id: userId } })
-		if (!info)
-			throw new NotFoundException('Что-то пошло не так, попробуйте повторить')
+		const info = this.infoRepository.create({ user: { id: userId } })
+		await this.infoRepository.save(info)
+		const updatedInfo = await this.updateFields(info, infoDto)
 
 		if (!this.checkInfo(info))
 			throw new BadRequestException('Были заполнены не все поля заявки!')
 
 		basket.status = 'PROCESS'
-		basket.info = info
+		basket.info = updatedInfo
 
 		const order = await this.basketRepository.save(basket)
 
@@ -158,8 +156,21 @@ export class BasketService {
 		return await this.basketRepository.find({
 			where: { user: { id: userId }, status: 'RECEIVED' },
 			relations: { products: { product: true }, info: true },
-			order: { createdAt: 'DESC' },
+			order: { updatedAt: 'DESC' },
 		})
+	}
+
+	async updateFields(info: InfoEntity, dto: InfoDto) {
+		info.name = dto.name
+		info.surname = dto.surname
+		info.country = dto.country
+		info.city = dto.city
+		info.street = dto.street
+		info.building = dto.building
+		info.apartment = dto.apartment
+		info.number = dto.number
+
+		return await this.infoRepository.save(info)
 	}
 
 	checkInfo(info: InfoEntity) {

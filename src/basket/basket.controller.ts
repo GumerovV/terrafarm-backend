@@ -1,4 +1,5 @@
 import {
+	Body,
 	Controller,
 	Delete,
 	Get,
@@ -6,10 +7,13 @@ import {
 	Param,
 	Patch,
 	Post,
+	UsePipes,
+	ValidationPipe,
 } from '@nestjs/common'
 import { BasketService } from './basket.service'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from './basket.decorator'
+import { InfoDto } from '../info/info.dto'
 
 @Controller('basket')
 export class BasketController {
@@ -68,10 +72,14 @@ export class BasketController {
 	}
 
 	@Post('/createOrder')
+	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Auth()
-	async createOrder(@CurrentUser('id') userId: number) {
-		return this.basketService.createOrder(userId)
+	async createOrder(
+		@CurrentUser('id') userId: number,
+		@Body() infoDto: InfoDto,
+	) {
+		return this.basketService.createOrder(userId, infoDto)
 	}
 
 	@Get('/getOrders')

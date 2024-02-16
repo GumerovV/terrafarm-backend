@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm'
+import { Column, Entity, OneToMany } from 'typeorm'
 import { Base } from '../../utils/base'
 import { BasketEntity } from '../basket/basket.entity'
 import { InfoEntity } from '../info/info.entity'
@@ -26,6 +26,6 @@ export class UserEntity extends Base {
 	@OneToMany(() => BasketEntity, basket => basket.user)
 	basket: BasketEntity[]
 
-	@OneToOne(() => InfoEntity, info => info.user)
-	info: InfoEntity
+	@OneToMany(() => InfoEntity, info => info.user)
+	info: InfoEntity[]
 }
