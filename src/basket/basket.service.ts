@@ -8,6 +8,7 @@ import { BasketItemEntity } from './basketItem.entity'
 import { Repository } from 'typeorm'
 import { BasketEntity } from './basket.entity'
 import { ProductEntity } from '../product/product.entity'
+import { InfoEntity } from '../info/info.entity'
 
 @Injectable()
 export class BasketService {
@@ -18,6 +19,8 @@ export class BasketService {
 		private readonly basketItemRepository: Repository<BasketItemEntity>,
 		@InjectRepository(ProductEntity)
 		private readonly productRepository: Repository<ProductEntity>,
+		@InjectRepository(InfoEntity)
+		private readonly infoRepository: Repository<InfoEntity>,
 	) {}
 
 	async getBasketId(userId: number) {
@@ -123,7 +126,16 @@ export class BasketService {
 		if (basket.products.length === 0)
 			throw new BadRequestException('Корзина пуста!')
 
+		const info = await this.infoRepository.findOneBy({ user: { id: userId } })
+		if (!info)
+			throw new NotFoundException('Что-то пошло не так, попробуйте повторить')
+
+		if (!this.checkInfo(info))
+			throw new BadRequestException('Были заполнены не все поля заявки!')
+
 		basket.status = 'PROCESS'
+		basket.info = info
+
 		const order = await this.basketRepository.save(basket)
 
 		const newBasket = this.basketRepository.create({
@@ -137,14 +149,27 @@ export class BasketService {
 	async getOrders(userId: number) {
 		return await this.basketRepository.find({
 			where: { user: { id: userId }, status: 'PROCESS' },
-			relations: { products: { product: true } },
+			relations: { products: { product: true }, info: true },
 		})
 	}
 
 	async getOrderHistory(userId: number) {
 		return await this.basketRepository.find({
 			where: { user: { id: userId }, status: 'RECEIVED' },
-			relations: { products: { product: true } },
+			relations: { products: { product: true }, info: true },
 		})
+	}
+
+	checkInfo(info: InfoEntity) {
+		if (!info.name) return false
+		else if (!info.surname) return false
+		else if (!info.country) return false
+		else if (!info.city) return false
+		else if (!info.street) return false
+		else if (!info.building) return false
+		else if (!info.apartment) return false
+		else if (!info.number) return false
+
+		return true
 	}
 }

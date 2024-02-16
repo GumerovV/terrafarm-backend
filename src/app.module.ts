@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module'
 import { BasketModule } from './basket/basket.module'
 import { ProductModule } from './product/product.module'
 import { AuthModule } from './auth/auth.module'
+import { InfoModule } from './info/info.module'
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { AuthModule } from './auth/auth.module'
 		BasketModule,
 		ProductModule,
 		AuthModule,
+		InfoModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

@@ -8,6 +8,7 @@ import { getJwtConfig } from '../../config/jwt.config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { UserEntity } from '../user/user.entity'
 import { BasketEntity } from '../basket/basket.entity'
+import { InfoEntity } from '../info/info.entity'
 
 @Module({
 	imports: [
@@ -17,7 +18,7 @@ import { BasketEntity } from '../basket/basket.entity'
 			inject: [ConfigService],
 			useFactory: getJwtConfig,
 		}),
-		TypeOrmModule.forFeature([UserEntity, BasketEntity]),
+		TypeOrmModule.forFeature([UserEntity, BasketEntity, InfoEntity]),
 	],
 	controllers: [AuthController],
 	providers: [AuthService, JwtStrategy],

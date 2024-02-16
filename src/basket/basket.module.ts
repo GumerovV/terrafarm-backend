@@ -6,6 +6,7 @@ import { UserEntity } from '../user/user.entity'
 import { ProductEntity } from '../product/product.entity'
 import { BasketItemEntity } from './basketItem.entity'
 import { BasketEntity } from './basket.entity'
+import { InfoEntity } from '../info/info.entity'
 
 @Module({
 	imports: [
@@ -14,6 +15,7 @@ import { BasketEntity } from './basket.entity'
 			ProductEntity,
 			BasketItemEntity,
 			BasketEntity,
+			InfoEntity,
 		]),
 	],
 	controllers: [BasketController],

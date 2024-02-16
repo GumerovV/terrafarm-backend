@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt'
 import { AuthDto, AuthResponseDto } from './auth.dto'
 import { compare, genSalt, hash } from 'bcryptjs'
 import { BasketEntity } from '../basket/basket.entity'
+import { InfoEntity } from '../info/info.entity'
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,8 @@ export class AuthService {
 		private readonly userRepository: Repository<UserEntity>,
 		@InjectRepository(BasketEntity)
 		private readonly basketRepository: Repository<BasketEntity>,
+		@InjectRepository(InfoEntity)
+		private readonly infoRepository: Repository<InfoEntity>,
 		private readonly jwtService: JwtService,
 	) {}
 
@@ -49,6 +52,9 @@ export class AuthService {
 
 		const basket = this.basketRepository.create({ user: user })
 		await this.basketRepository.save(basket)
+
+		const info = this.infoRepository.create({ user: user })
+		await this.infoRepository.save(info)
 
 		return {
 			user: this.returnUserFields(user),
