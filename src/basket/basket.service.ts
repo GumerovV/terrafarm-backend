@@ -150,6 +150,7 @@ export class BasketService {
 		return await this.basketRepository.find({
 			where: { user: { id: userId }, status: 'PROCESS' },
 			relations: { products: { product: true }, info: true },
+			order: { createdAt: 'DESC' },
 		})
 	}
 
@@ -157,6 +158,7 @@ export class BasketService {
 		return await this.basketRepository.find({
 			where: { user: { id: userId }, status: 'RECEIVED' },
 			relations: { products: { product: true }, info: true },
+			order: { createdAt: 'DESC' },
 		})
 	}
 

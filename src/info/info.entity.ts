@@ -1,5 +1,5 @@
 import { Base } from '../../utils/base'
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm'
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 import { UserEntity } from '../user/user.entity'
 import { BasketEntity } from '../basket/basket.entity'
 
@@ -33,7 +33,7 @@ export class InfoEntity extends Base {
 	@JoinColumn({ name: 'user_id' })
 	user: UserEntity
 
-	@OneToOne(() => BasketEntity, basket => basket.info)
+	@OneToMany(() => BasketEntity, basket => basket.info)
 	@JoinColumn({ name: 'basket_id' })
-	basket: BasketEntity
+	basket: BasketEntity[]
 }

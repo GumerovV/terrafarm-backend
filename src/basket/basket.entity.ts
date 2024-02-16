@@ -1,13 +1,6 @@
 import { Base } from '../../utils/base'
 import { UserEntity } from '../user/user.entity'
-import {
-	Column,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	OneToMany,
-	OneToOne,
-} from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm'
 import { BasketItemEntity } from './basketItem.entity'
 import { InfoEntity } from '../info/info.entity'
 
@@ -23,6 +16,7 @@ export class BasketEntity extends Base {
 	@JoinColumn({ name: 'user_id' })
 	user: UserEntity
 
-	@OneToOne(() => InfoEntity, info => info.basket, { nullable: true })
+	@ManyToOne(() => InfoEntity, info => info.basket, { nullable: true })
+	@JoinColumn({ name: 'info_id' })
 	info: InfoEntity
 }

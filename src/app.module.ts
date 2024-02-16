@@ -9,6 +9,7 @@ import { BasketModule } from './basket/basket.module'
 import { ProductModule } from './product/product.module'
 import { AuthModule } from './auth/auth.module'
 import { InfoModule } from './info/info.module'
+import { AdminModule } from './admin/admin.module';
 
 @Module({
 	imports: [
@@ -23,6 +24,7 @@ import { InfoModule } from './info/info.module'
 		ProductModule,
 		AuthModule,
 		InfoModule,
+		AdminModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
