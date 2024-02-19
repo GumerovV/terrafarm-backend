@@ -20,7 +20,7 @@ export class AdminService {
 			where: { status: searchTerm },
 			relations: { products: { product: true }, info: true },
 			order: {
-				createdAt: 'DESC',
+				updatedAt: 'DESC',
 			},
 		})
 

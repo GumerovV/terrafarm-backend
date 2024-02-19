@@ -10,6 +10,7 @@ import { BasketEntity } from './basket.entity'
 import { ProductEntity } from '../product/product.entity'
 import { InfoEntity } from '../info/info.entity'
 import { InfoDto } from '../info/info.dto'
+import { NoAuthOrderDto, Product } from './basket.dto'
 
 @Injectable()
 export class BasketService {
@@ -142,6 +143,46 @@ export class BasketService {
 		await this.basketRepository.save(newBasket)
 
 		return order
+	}
+
+	async createOrderNoAuth(orderDto: NoAuthOrderDto) {
+		await this.productsValidateNoAuth(orderDto.products)
+
+		const newInfo = this.infoRepository.create({ user: null })
+		const info = await this.infoRepository.save(newInfo)
+		const updatedInfo = await this.updateFields(info, orderDto)
+
+		if (!this.checkInfo(updatedInfo))
+			throw new BadRequestException('Были заполнены не все поля заявки!')
+
+		const newBasket = this.basketRepository.create({
+			user: null,
+			info: updatedInfo,
+			status: 'PROCESS',
+		})
+		const basket = await this.basketRepository.save(newBasket)
+
+		orderDto.products.map(async product => {
+			const item = this.basketItemRepository.create({
+				basket: basket,
+				product: { id: product.id },
+				count: product.count,
+			})
+			await this.basketItemRepository.save(item)
+		})
+
+		return basket
+	}
+
+	async productsValidateNoAuth(products: Product[]) {
+		if (!products.length) throw new BadRequestException('Корзина пуста!')
+
+		for (const product of products) {
+			const findProduct = await this.productRepository.findOneBy({
+				id: product.id,
+			})
+			if (!findProduct) throw new NotFoundException('Продукт не найден!')
+		}
 	}
 
 	async getOrders(userId: number) {

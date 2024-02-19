@@ -19,7 +19,7 @@ export class BasketEntity extends Base {
 	@OneToMany(() => BasketItemEntity, product => product.basket)
 	products?: BasketItemEntity[]
 
-	@ManyToOne(() => UserEntity, user => user.basket)
+	@ManyToOne(() => UserEntity, user => user.basket, { nullable: true })
 	@JoinColumn({ name: 'user_id' })
 	user: UserEntity
 

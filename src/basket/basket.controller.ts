@@ -14,6 +14,7 @@ import { BasketService } from './basket.service'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from './basket.decorator'
 import { InfoDto } from '../info/info.dto'
+import { NoAuthOrderDto } from './basket.dto'
 
 @Controller('basket')
 export class BasketController {
@@ -80,6 +81,13 @@ export class BasketController {
 		@Body() infoDto: InfoDto,
 	) {
 		return this.basketService.createOrder(userId, infoDto)
+	}
+
+	@Post('/no-auth/createOrder')
+	@UsePipes(new ValidationPipe())
+	@HttpCode(200)
+	async NoAuthCreateOrder(@Body() orderDto: NoAuthOrderDto) {
+		return this.basketService.createOrderNoAuth(orderDto)
 	}
 
 	@Get('/getOrders')
