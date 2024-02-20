@@ -59,6 +59,13 @@ export class AuthService {
 		}
 	}
 
+	async check(user: UserEntity) {
+		return {
+			user: this.returnUserFields(user),
+			accessToken: await this.issueAccessToken(user.id, user.email, user.role),
+		}
+	}
+
 	async validateUser(dto: AuthDto) {
 		const user = await this.userRepository.findOne({
 			where: {
@@ -92,6 +99,7 @@ export class AuthService {
 		return {
 			id: user.id,
 			email: user.email,
+			role: user.role,
 		}
 	}
 }
