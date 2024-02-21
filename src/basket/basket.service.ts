@@ -10,7 +10,7 @@ import { BasketEntity } from './basket.entity'
 import { ProductEntity } from '../product/product.entity'
 import { InfoEntity } from '../info/info.entity'
 import { InfoDto } from '../info/info.dto'
-import { NoAuthOrderDto, Product } from './basket.dto'
+import { BasketItemDto, NoAuthOrderDto, Product } from './basket.dto'
 
 @Injectable()
 export class BasketService {
@@ -39,14 +39,14 @@ export class BasketService {
 	}
 
 	async getBasket(basketId: number) {
-		const basket = await this.basketRepository.findOne({
-			where: { id: basketId, status: 'ACTIVE' },
-			relations: {
-				products: {
-					product: true,
-				},
-			},
-		})
+		const basket = await this.basketRepository
+			.createQueryBuilder('basket')
+			.leftJoinAndSelect('basket.products', 'products')
+			.leftJoinAndSelect('products.product', 'product')
+			.where('basket.id = :id', { id: basketId })
+			.andWhere('basket.status = :status', { status: 'ACTIVE' })
+			.orderBy('products.createdAt', 'DESC')
+			.getOne()
 
 		return basket
 	}
@@ -96,7 +96,7 @@ export class BasketService {
 		return deletedItem
 	}
 
-	async create(basketId: number, productId: number) {
+	async create(basketId: number, productId: number, dto: BasketItemDto) {
 		const basket = await this.basketRepository.findOneBy({ id: basketId })
 
 		if (!basket)
@@ -109,6 +109,7 @@ export class BasketService {
 		const createdItem = this.basketItemRepository.create({
 			basket: basket,
 			product: { id: productId },
+			color: dto && Object.keys(dto).length ? dto.color : null,
 		})
 		const basketItem = await this.basketItemRepository.save(createdItem)
 

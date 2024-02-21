@@ -14,7 +14,7 @@ import { BasketService } from './basket.service'
 import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from './basket.decorator'
 import { InfoDto } from '../info/info.dto'
-import { NoAuthOrderDto } from './basket.dto'
+import { BasketItemDto, NoAuthOrderDto } from './basket.dto'
 
 @Controller('basket')
 export class BasketController {
@@ -34,9 +34,10 @@ export class BasketController {
 	async addBasketItem(
 		@CurrentUser('id') userId: number,
 		@Param('productId') productId: string,
+		@Body() dto: BasketItemDto,
 	) {
 		const basketId = await this.basketService.getBasketId(userId)
-		return this.basketService.create(basketId, +productId)
+		return this.basketService.create(basketId, +productId, dto)
 	}
 
 	@Delete('/deleteFromBasket/:basketItemId')

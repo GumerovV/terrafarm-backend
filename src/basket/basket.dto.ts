@@ -1,5 +1,5 @@
 import { InfoDto } from '../info/info.dto'
-import { IsArray, IsNumber, ValidateNested } from 'class-validator'
+import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 
 export class Product {
@@ -15,4 +15,9 @@ export class NoAuthOrderDto extends InfoDto {
 	@ValidateNested({ each: true })
 	@Type(() => Product)
 	products: Product[]
+}
+
+export class BasketItemDto {
+	@IsString()
+	color: string
 }

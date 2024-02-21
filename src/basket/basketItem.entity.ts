@@ -8,6 +8,9 @@ export class BasketItemEntity extends Base {
 	@Column({ default: 1 })
 	count?: number
 
+	@Column({ default: null, nullable: true })
+	color: string | null
+
 	@ManyToOne(() => ProductEntity, product => product)
 	@JoinColumn({ name: 'product_id' })
 	product: ProductEntity
