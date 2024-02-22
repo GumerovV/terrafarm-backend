@@ -18,6 +18,21 @@ export class UserEntity extends Base {
 	surname?: string
 
 	@Column({ default: '' })
+	country?: string
+
+	@Column({ default: '' })
+	city?: string
+
+	@Column({ default: '' })
+	street?: string
+
+	@Column({ default: '' })
+	building?: string
+
+	@Column({ default: '' })
+	apartment?: string
+
+	@Column({ default: '' })
 	number?: string
 
 	@Column({ default: 'USER' })
