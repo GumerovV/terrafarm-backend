@@ -71,7 +71,20 @@ export class AuthService {
 			where: {
 				email: dto.email,
 			},
-			select: ['id', 'email', 'password', 'role'],
+			select: [
+				'id',
+				'email',
+				'password',
+				'role',
+				'name',
+				'surname',
+				'country',
+				'city',
+				'street',
+				'building',
+				'apartment',
+				'number',
+			],
 		})
 
 		if (!user) throw new NotFoundException('Не верный email или пароль!')
@@ -100,6 +113,14 @@ export class AuthService {
 			id: user.id,
 			email: user.email,
 			role: user.role,
+			name: user.name,
+			surname: user.surname,
+			country: user.country,
+			city: user.city,
+			street: user.street,
+			building: user.building,
+			apartment: user.apartment,
+			number: user.number,
 		}
 	}
 }
