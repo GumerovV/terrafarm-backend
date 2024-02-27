@@ -7,6 +7,7 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 	UsePipes,
 	ValidationPipe,
 } from '@nestjs/common'
@@ -15,6 +16,7 @@ import { Auth } from '../auth/decorators/auth.decorator'
 import { CurrentUser } from './basket.decorator'
 import { InfoDto } from '../info/info.dto'
 import { BasketItemDto, NoAuthOrderDto } from './basket.dto'
+import { GetAllOrdersDto } from '../admin/admin.dto'
 
 @Controller('basket')
 export class BasketController {
@@ -103,5 +105,15 @@ export class BasketController {
 	@Auth()
 	async getOrdersHistory(@CurrentUser('id') userId: number) {
 		return this.basketService.getOrderHistory(userId)
+	}
+
+	@Get('/getAllOrders')
+	@HttpCode(200)
+	@Auth()
+	async getAllOrders(
+		@CurrentUser('id') userId: number,
+		@Query() queryDto: GetAllOrdersDto,
+	) {
+		return this.basketService.getAllOrders(userId, queryDto)
 	}
 }

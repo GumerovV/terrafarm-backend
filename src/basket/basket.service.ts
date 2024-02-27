@@ -5,12 +5,13 @@ import {
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { BasketItemEntity } from './basketItem.entity'
-import { Repository } from 'typeorm'
+import { In, Repository } from 'typeorm'
 import { BasketEntity } from './basket.entity'
 import { ProductEntity } from '../product/product.entity'
 import { InfoEntity } from '../info/info.entity'
 import { InfoDto } from '../info/info.dto'
 import { BasketItemDto, NoAuthOrderDto, Product } from './basket.dto'
+import { EnumOrderStatus, GetAllOrdersDto } from '../admin/admin.dto'
 
 @Injectable()
 export class BasketService {
@@ -200,6 +201,28 @@ export class BasketService {
 			relations: { products: { product: true }, info: true },
 			order: { updatedAt: 'DESC' },
 		})
+	}
+
+	async getAllOrders(userId: number, dto: GetAllOrdersDto) {
+		const orders = await this.basketRepository.find({
+			where: {
+				user: { id: userId },
+				status:
+					dto?.searchTerm ||
+					In([EnumOrderStatus.RECEIVED, EnumOrderStatus.PROCESS]),
+			},
+			relations: {
+				products: {
+					product: true,
+				},
+				info: true,
+			},
+			order: {
+				updatedAt: 'DESC',
+			},
+		})
+
+		return orders
 	}
 
 	async updateFields(info: InfoEntity, dto: InfoDto) {
