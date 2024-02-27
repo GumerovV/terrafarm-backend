@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { BasketEntity } from '../basket/basket.entity'
-import { Repository } from 'typeorm'
+import { In, Repository } from 'typeorm'
 import { EnumOrderStatus, GetAllOrdersDto } from './admin.dto'
 
 @Injectable()
@@ -17,7 +17,11 @@ export class AdminService {
 		if (!searchTerm) searchTerm = EnumOrderStatus.PROCESS
 
 		const orders = await this.basketRepository.find({
-			where: { status: searchTerm },
+			where: {
+				status:
+					dto?.searchTerm ||
+					In([EnumOrderStatus.RECEIVED, EnumOrderStatus.PROCESS]),
+			},
 			relations: { products: { product: true }, info: true },
 			order: {
 				updatedAt: 'DESC',
