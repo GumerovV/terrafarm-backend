@@ -168,6 +168,7 @@ export class BasketService {
 			const item = this.basketItemRepository.create({
 				basket: basket,
 				product: { id: product.id },
+				color: product.color,
 				count: product.count,
 			})
 			await this.basketItemRepository.save(item)

@@ -8,6 +8,9 @@ export class Product {
 
 	@IsNumber()
 	count: number
+
+	@IsString()
+	color: string
 }
 
 export class NoAuthOrderDto extends InfoDto {

@@ -13,7 +13,7 @@ import { Auth, Roles } from '../auth/decorators/auth.decorator'
 import { GetAllOrdersDto } from './admin.dto'
 
 @Auth()
-@Roles('ADMIN')
+@Roles('ADMIN', 'USER')
 @Controller('admin')
 export class AdminController {
 	constructor(private readonly adminService: AdminService) {}
