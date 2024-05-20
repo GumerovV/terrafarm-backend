@@ -12,6 +12,7 @@ import { InfoEntity } from '../info/info.entity'
 import { InfoDto } from '../info/info.dto'
 import { BasketItemDto, NoAuthOrderDto, Product } from './basket.dto'
 import { EnumOrderStatus, GetAllOrdersDto } from '../admin/admin.dto'
+import { MailerService } from '@nestjs-modules/mailer'
 
 @Injectable()
 export class BasketService {
@@ -24,6 +25,7 @@ export class BasketService {
 		private readonly productRepository: Repository<ProductEntity>,
 		@InjectRepository(InfoEntity)
 		private readonly infoRepository: Repository<InfoEntity>,
+		private readonly mailService: MailerService,
 	) {}
 
 	async getBasketId(userId: number) {
@@ -120,7 +122,11 @@ export class BasketService {
 	async createOrder(userId: number, infoDto: InfoDto) {
 		const basket = await this.basketRepository.findOne({
 			where: { user: { id: userId }, status: 'ACTIVE' },
-			relations: { products: true },
+			relations: {
+				products: { product: true },
+				info: { user: true },
+				user: true,
+			},
 		})
 
 		if (!basket) throw new NotFoundException('Активная корзина не найдена!')
@@ -144,6 +150,8 @@ export class BasketService {
 		})
 		await this.basketRepository.save(newBasket)
 
+		this.sendEmail(order)
+
 		return order
 	}
 
@@ -164,7 +172,7 @@ export class BasketService {
 		})
 		const basket = await this.basketRepository.save(newBasket)
 
-		orderDto.products.map(async product => {
+		for (const product of orderDto.products) {
 			const item = this.basketItemRepository.create({
 				basket: basket,
 				product: { id: product.id },
@@ -172,7 +180,17 @@ export class BasketService {
 				count: product.count,
 			})
 			await this.basketItemRepository.save(item)
+		}
+
+		const order = await this.basketRepository.findOne({
+			where: { id: basket.id },
+			relations: {
+				products: { product: true },
+				info: true,
+			},
 		})
+
+		this.sendEmail(order)
 
 		return basket
 	}
@@ -250,5 +268,40 @@ export class BasketService {
 		else if (!info.number) return false
 
 		return true
+	}
+
+	sendEmail(order: BasketEntity) {
+		console.log(order)
+		const productList = order?.products
+			?.map(
+				item =>
+					`<li>${item.product.name} ${item.color} - ${item.count} x ${item.product.price} руб.</li>`,
+			)
+			?.join('')
+
+		const htmlMessage = `
+		<p style="font-size: 16px; font-weight: bold;">Номер заказа: <b style="font-size: 32px;">${order.id}</b></p>
+		<p style="font-size: 16px; font-weight: bold;">Товары:</p>
+		<ul>${productList}</ul>
+		<p style="font-size: 16px; font-weight: bold;">Детали заказа:</p>
+		<ul>
+			<li><b>Имя:</b> ${order?.info?.name}</li>
+			<li><b>Фамилия:</b> ${order?.info?.surname}</li>
+			<li><b>Номер телефона:</b> ${order?.info?.number}</li>
+			<li><b>Электронная почта:</b> ${order?.user?.email}</li>
+			<li><b>Страна:</b> ${order?.info?.country}</li>
+			<li><b>Город:</b> ${order?.info?.city}</li>
+			<li><b>Улица:</b> ${order?.info?.street}</li>
+			<li><b>Дом:</b> ${order?.info?.building}</li>
+			<li><b>Квартира:</b> ${order?.info?.apartment}</li>
+		</ul>
+		`
+
+		this.mailService.sendMail({
+			from: 'TerraFarm',
+			to: 'gumerov.vlad20034@gmail.com',
+			subject: `НОВЫЙ ЗАКАЗ! Номер заказа: ${order.id}`,
+			html: htmlMessage,
+		})
 	}
 }

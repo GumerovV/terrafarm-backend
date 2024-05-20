@@ -13,6 +13,7 @@ import { AdminModule } from './admin/admin.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import * as path from 'path'
 import * as process from 'process'
+import { MailerModule } from '@nestjs-modules/mailer'
 
 @Module({
 	imports: [
@@ -32,6 +33,15 @@ import * as process from 'process'
 		AuthModule,
 		InfoModule,
 		AdminModule,
+		MailerModule.forRoot({
+			transport: {
+				host: process.env.SMTP_HOST,
+				auth: {
+					user: process.env.SMTP_USER,
+					pass: process.env.SMTP_PASSWORD,
+				},
+			},
+		}),
 	],
 	controllers: [AppController],
 	providers: [AppService],

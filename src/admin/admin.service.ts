@@ -14,6 +14,8 @@ export class AdminService {
 	async getAllOrders(dto: GetAllOrdersDto) {
 		let searchTerm = dto.searchTerm
 
+		console.log(`searchTerm = ${searchTerm}`)
+
 		if (!searchTerm) searchTerm = EnumOrderStatus.PROCESS
 
 		const orders = await this.basketRepository.find({
